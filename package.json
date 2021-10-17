@@ -1,0 +1,19 @@
+{
+  "name": "puppeteerBenchmark",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "bench": "ts-node src/runBenchmark.ts"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/node": "16.4.0",
+    "ts-node": "10.1.0",
+    "typescript": "4.3.5"
+  },
+  "dependencies": {
+    "puppeteer-core": "^10.4.0"
+  }
+}
