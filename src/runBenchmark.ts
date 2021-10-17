@@ -2,6 +2,8 @@ import { readFile } from "fs/promises";
 import puppeteer from "puppeteer-core";
 import { Browser, Page } from "puppeteer-core";
 
+/* Simulate what js-framework-benchmark does when computing
+ the duration from the chrome tracing events */
 interface TimelineEvents {
   clickStart: number;
   paintEnd: number;
@@ -31,12 +33,14 @@ async function fetchEventsFromPerformanceLog(fileName: string): Promise<Timeline
   return extractRelevantEvents(entries);
 }
 
+/* Initialize puppeteer  */
 async function init() {
   const width = 1280;
   const height = 800;
 
   const browser = await puppeteer.launch({
     headless: false,
+    // Change path here when chrome isn't found
     executablePath:
       process.platform == "darwin" ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" : "google-chrome",
     ignoreDefaultArgs: ["--enable-automation"],
@@ -50,6 +54,10 @@ async function init() {
   return browser;
 }
 
+/* Run the benchmark: Load the page, wait for page, click on append 1,000 rows.
+    Can be run with tracing enabled or disabled.
+    Returns timing info from metrics() and if tracing is enabled extract the duration from the timeline.
+*/
 async function run(page: Page, framework: string, url: string, trace: boolean) {
   await page.goto(url);
   await page.waitForSelector("#add");
@@ -101,6 +109,9 @@ async function run(page: Page, framework: string, url: string, trace: boolean) {
 async function main() {
   const browser = await init();
   const page = await browser.newPage();
+
+  // The frameworks attempt to measure duration on the client side and print it on the
+  // console. We're buffering the console output to compute the average.
   let consoleBuffer: string[] = [];
   page.on("console", async (msg) => {
     for (let i = 0; i < msg.args().length; ++i) {
@@ -128,15 +139,16 @@ async function main() {
         average += duration.sum;
         averageTimeline += duration.timelineResult;
       }
-      result[trace ? "durWithTracing" : "durNoTracing"] = average / COUNT;
+      result[trace ? "durWithTracing" : "durNoTracing"] = (average / COUNT).toFixed(3);
       if (consoleBuffer.length != 5) throw "Expected 5 console messages, but there were only " + consoleBuffer;
-      result[trace ? "consoleWithTracing" : "consoleNoTracing"] =
-        consoleBuffer.reduce((p, c) => Number(c) + p, 0) / COUNT;
-      if (trace) result["timelineResult"] = averageTimeline / COUNT / 1000.0;
+      result[trace ? "clientWithTracing" : "clientNoTracing"] = (
+        consoleBuffer.reduce((p, c) => Number(c) + p, 0) / COUNT
+      ).toFixed(3);
+      if (trace) result["timelineResult"] = (averageTimeline / COUNT / 1000.0).toFixed(3);
       consoleBuffer = [];
     }
-    result["tracingSlowdown"] = result.durWithTracing / result.durNoTracing;
-    result["consolelowdown"] = result.consoleWithTracing / result.consoleNoTracing;
+    result["tracingSlowdown"] = (Number(result.durWithTracing) / Number(result.durNoTracing)).toFixed(3);
+    result["consolelowdown"] = (Number(result.clientWithTracing) / Number(result.clientNoTracing)).toFixed(3);
     results.push(result);
   }
   await browser.close();
