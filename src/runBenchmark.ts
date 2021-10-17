@@ -1,5 +1,35 @@
+import { readFile } from "fs/promises";
 import puppeteer from "puppeteer-core";
 import { Browser, Page } from "puppeteer-core";
+
+interface TimelineEvents {
+  clickStart: number;
+  paintEnd: number;
+}
+
+function extractRelevantEvents(entries: any[]): TimelineEvents {
+  let result = { clickStart: 0, paintEnd: 0 };
+  entries.forEach((x) => {
+    let e = x;
+    // console.log(JSON.stringify(e));
+    if (e.name === "EventDispatch") {
+      if (e.args.data.type === "click") {
+        // console.log("CLICK ",+e.ts);
+        result.clickStart = +e.ts;
+      }
+    } else if (e.name === "Paint" && e.ph === "X") {
+      result.paintEnd = Math.max(result.paintEnd, +e.ts + e.dur);
+    }
+  });
+  return result;
+}
+
+async function fetchEventsFromPerformanceLog(fileName: string): Promise<TimelineEvents> {
+  let contents = await readFile(fileName, { encoding: "utf8" });
+  let json = JSON.parse(contents);
+  let entries = json["traceEvents"];
+  return extractRelevantEvents(entries);
+}
 
 async function init() {
   const width = 1280;
@@ -25,10 +55,11 @@ async function run(page: Page, framework: string, url: string, trace: boolean) {
   await page.waitForSelector("#add");
 
   let metricsBefore = await page.metrics();
+  let traceFileName = `trace_${framework}.json`;
 
   if (trace) {
     await page.tracing.start({
-      path: `trace_${framework}.json`,
+      path: traceFileName,
       screenshots: false,
       categories: ["devtools.timeline", "blink.user_timing"],
     });
@@ -47,9 +78,6 @@ async function run(page: Page, framework: string, url: string, trace: boolean) {
     layoutCountOfPreviousFrame = LayoutCount;
     await new Promise((res) => globalThis.setTimeout(res, 16, []));
   }
-  if (trace) {
-    await page.tracing.stop();
-  }
   let metricsAfter = await page.metrics();
   //   console.log(metricsAfter);
   let duration = {
@@ -57,10 +85,16 @@ async function run(page: Page, framework: string, url: string, trace: boolean) {
     layout: (metricsAfter.LayoutDuration! - metricsBefore.LayoutDuration!) * 1000.0,
     script: (metricsAfter.ScriptDuration! - metricsBefore.ScriptDuration!) * 1000.0,
     task: (metricsAfter.TaskDuration! - metricsBefore.TaskDuration!) * 1000.0,
+    timelineResult: 0,
     get sum() {
       return this.task;
     },
   };
+  if (trace) {
+    await page.tracing.stop();
+    let timelineResult = await fetchEventsFromPerformanceLog(traceFileName);
+    duration.timelineResult = timelineResult.paintEnd - timelineResult.clickStart;
+  }
   return duration;
 }
 
@@ -88,14 +122,17 @@ async function main() {
     let result: any = { framework };
     for (let trace of doTrace) {
       let average = 0;
+      let averageTimeline = 0;
       for (let i = 0; i < COUNT; i++) {
         let duration = await run(page, framework, makeUrl(framework), trace);
         average += duration.sum;
+        averageTimeline += duration.timelineResult;
       }
       result[trace ? "durWithTracing" : "durNoTracing"] = average / COUNT;
       if (consoleBuffer.length != 5) throw "Expected 5 console messages, but there were only " + consoleBuffer;
       result[trace ? "consoleWithTracing" : "consoleNoTracing"] =
         consoleBuffer.reduce((p, c) => Number(c) + p, 0) / COUNT;
+      if (trace) result["timelineResult"] = averageTimeline / COUNT / 1000.0;
       consoleBuffer = [];
     }
     result["tracingSlowdown"] = result.durWithTracing / result.durNoTracing;
