@@ -67,8 +67,13 @@ async function run(page: Page, framework: string, url: string, trace: boolean) {
 async function main() {
   const browser = await init();
   const page = await browser.newPage();
-  page.on("console", (msg) => {
-    for (let i = 0; i < msg.args().length; ++i) console.log(`[CONSOLE]: ${msg.args()[i]}`);
+  let consoleBuffer: string[] = [];
+  page.on("console", async (msg) => {
+    for (let i = 0; i < msg.args().length; ++i) {
+      let val = await msg.args()[i].jsonValue();
+      consoleBuffer.push((val as any).toString());
+      console.log(`[CONSOLE]: ${val}`);
+    }
   });
 
   const COUNT = 5;
@@ -88,8 +93,13 @@ async function main() {
         average += duration.sum;
       }
       result[trace ? "durWithTracing" : "durNoTracing"] = average / COUNT;
+      if (consoleBuffer.length != 5) throw "Expected 5 console messages, but there were only " + consoleBuffer;
+      result[trace ? "consoleWithTracing" : "consoleNoTracing"] =
+        consoleBuffer.reduce((p, c) => Number(c) + p, 0) / COUNT;
+      consoleBuffer = [];
     }
     result["tracingSlowdown"] = result.durWithTracing / result.durNoTracing;
+    result["consolelowdown"] = result.consoleWithTracing / result.consoleNoTracing;
     results.push(result);
   }
   await browser.close();
