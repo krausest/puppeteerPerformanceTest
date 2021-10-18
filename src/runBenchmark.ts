@@ -132,7 +132,7 @@ async function main() {
   // console. We're buffering the console output to compute the average.
   let consoleBuffer: string[] = [];
 
-  const COUNT = 10;
+  const COUNT = 8;
 
   const doTrace = [true, false];
   // const framkeworks = ["svelte"];
@@ -143,9 +143,9 @@ async function main() {
   for (let framework of framkeworks) {
     let vresult = {
       framework,
-      durWithTracing: new Values(),
-      durNoTracing: new Values(),
-      clientWithTracing: new Values(),
+      taskTracing: new Values(),
+      taskNoTracing: new Values(),
+      clientTracing: new Values(),
       clientNoTracing: new Values(),
       timeline: new Values(),
     };
@@ -161,13 +161,13 @@ async function main() {
           }
         });
         let duration = await run(page, framework, makeUrl(framework), trace);
-        vresult[trace ? "durWithTracing" : "durNoTracing"].add(duration.task);
+        vresult[trace ? "taskTracing" : "taskNoTracing"].add(duration.task);
         if (trace) vresult["timeline"].add(duration.timelineResult);
         await browser.close();
       }
       if (consoleBuffer.length != COUNT) throw "Expected 5 console messages, but there were only " + consoleBuffer;
       consoleBuffer.forEach((c) => {
-        vresult[trace ? "clientWithTracing" : "clientNoTracing"].add(Number(c));
+        vresult[trace ? "clientTracing" : "clientNoTracing"].add(Number(c));
       });
       consoleBuffer = [];
     }
@@ -176,8 +176,8 @@ async function main() {
       let o: any = (vresult as any)[k];
       result[k] = o instanceof Values ? o.toString() : o;
     }
-    result["tracingFactor"] = (vresult.durWithTracing.statistics().mean / vresult.durNoTracing.statistics().mean).toFixed(3);
-    result["clientFactor"] = (vresult.clientWithTracing.statistics().mean / vresult.clientNoTracing.statistics().mean).toFixed(3);
+    result["taskFactor"] = (vresult.taskTracing.statistics().mean / vresult.taskNoTracing.statistics().mean).toFixed(3);
+    result["clientFactor"] = (vresult.clientTracing.statistics().mean / vresult.clientNoTracing.statistics().mean).toFixed(3);
     results.push(result);
   }
   console.table(results);
