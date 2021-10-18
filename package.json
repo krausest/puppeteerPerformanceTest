@@ -14,6 +14,7 @@
     "typescript": "4.3.5"
   },
   "dependencies": {
+    "jstat": "^1.9.5",
     "puppeteer-core": "^10.4.0"
   }
 }

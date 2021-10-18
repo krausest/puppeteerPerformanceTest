@@ -1,6 +1,28 @@
 import { readFile } from "fs/promises";
 import puppeteer from "puppeteer-core";
 import { Browser, Page } from "puppeteer-core";
+import { resourceLimits } from "worker_threads";
+const jStat = require("jstat").jStat;
+
+class Values {
+  private values: number[] = [];
+  public add(value: number) {
+    this.values.push(value);
+  }
+  public statistics() {
+    let s = jStat(this.values);
+    let r = {
+      mean: s.mean(),
+      standardDeviation: s.stdev(true),
+    };
+    console.log(r, this.values);
+    return r;
+  }
+  toString() {
+    let s = this.statistics();
+    return `${s.mean.toFixed(3)} (${s.standardDeviation.toFixed(3)})`;
+  }
+}
 
 /* Simulate what js-framework-benchmark does when computing
  the duration from the chrome tracing events */
@@ -41,8 +63,7 @@ async function init() {
   const browser = await puppeteer.launch({
     headless: false,
     // Change path here when chrome isn't found
-    executablePath:
-      process.platform == "darwin" ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" : "google-chrome",
+    executablePath: process.platform == "darwin" ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" : "google-chrome",
     ignoreDefaultArgs: ["--enable-automation"],
     args: [`--window-size=${width},${height}`],
     dumpio: false,
@@ -69,7 +90,7 @@ async function run(page: Page, framework: string, url: string, trace: boolean) {
     await page.tracing.start({
       path: traceFileName,
       screenshots: false,
-      categories: ["devtools.timeline", "blink.user_timing"],
+      categories: ["devtools.timeline"], //, "blink.user_timing"],
     });
   }
 
@@ -94,64 +115,71 @@ async function run(page: Page, framework: string, url: string, trace: boolean) {
     script: (metricsAfter.ScriptDuration! - metricsBefore.ScriptDuration!) * 1000.0,
     task: (metricsAfter.TaskDuration! - metricsBefore.TaskDuration!) * 1000.0,
     timelineResult: 0,
-    get sum() {
-      return this.task;
-    },
   };
   if (trace) {
     await page.tracing.stop();
     let timelineResult = await fetchEventsFromPerformanceLog(traceFileName);
-    duration.timelineResult = timelineResult.paintEnd - timelineResult.clickStart;
+    duration.timelineResult = (timelineResult.paintEnd - timelineResult.clickStart) / 1000.0;
+    console.log(`${framework} ${trace ? "trace" : "no-trace"} task ${duration.task} timeline ${duration.timelineResult}`);
+  } else {
+    console.log(`${framework} ${trace ? "trace" : "no-trace"} task ${duration.task} `);
   }
   return duration;
 }
 
 async function main() {
-  const browser = await init();
-  const page = await browser.newPage();
-
   // The frameworks attempt to measure duration on the client side and print it on the
   // console. We're buffering the console output to compute the average.
   let consoleBuffer: string[] = [];
-  page.on("console", async (msg) => {
-    for (let i = 0; i < msg.args().length; ++i) {
-      let val = await msg.args()[i].jsonValue();
-      consoleBuffer.push((val as any).toString());
-      console.log(`[CONSOLE]: ${val}`);
-    }
-  });
 
-  const COUNT = 5;
+  const COUNT = 10;
 
   const doTrace = [true, false];
+  // const framkeworks = ["svelte"];
   const framkeworks = ["vanillajs", "svelte", "react-hooks", "domvm", "fidan"];
   const makeUrl = (name: string) => `https://stefankrause.net/chrome-perf/frameworks/keyed/${name}/index.html`;
-
-  let results: Array<any> = [];
+  let results: any[] = [];
 
   for (let framework of framkeworks) {
-    let result: any = { framework };
+    let vresult = {
+      framework,
+      durWithTracing: new Values(),
+      durNoTracing: new Values(),
+      clientWithTracing: new Values(),
+      clientNoTracing: new Values(),
+      timeline: new Values(),
+    };
     for (let trace of doTrace) {
-      let average = 0;
-      let averageTimeline = 0;
       for (let i = 0; i < COUNT; i++) {
+        const browser = await init();
+        const page = await browser.newPage();
+        page.on("console", async (msg) => {
+          for (let i = 0; i < msg.args().length; ++i) {
+            let val = await msg.args()[i].jsonValue();
+            consoleBuffer.push((val as any).toString());
+            console.log(`${framework} ${trace ? "trace" : "notrace"} [CONSOLE]: ${val}`);
+          }
+        });
         let duration = await run(page, framework, makeUrl(framework), trace);
-        average += duration.sum;
-        averageTimeline += duration.timelineResult;
+        vresult[trace ? "durWithTracing" : "durNoTracing"].add(duration.task);
+        if (trace) vresult["timeline"].add(duration.timelineResult);
+        await browser.close();
       }
-      result[trace ? "durWithTracing" : "durNoTracing"] = (average / COUNT).toFixed(3);
-      if (consoleBuffer.length != 5) throw "Expected 5 console messages, but there were only " + consoleBuffer;
-      result[trace ? "clientWithTracing" : "clientNoTracing"] = (
-        consoleBuffer.reduce((p, c) => Number(c) + p, 0) / COUNT
-      ).toFixed(3);
-      if (trace) result["timelineResult"] = (averageTimeline / COUNT / 1000.0).toFixed(3);
+      if (consoleBuffer.length != COUNT) throw "Expected 5 console messages, but there were only " + consoleBuffer;
+      consoleBuffer.forEach((c) => {
+        vresult[trace ? "clientWithTracing" : "clientNoTracing"].add(Number(c));
+      });
       consoleBuffer = [];
     }
-    result["tracingSlowdown"] = (Number(result.durWithTracing) / Number(result.durNoTracing)).toFixed(3);
-    result["consolelowdown"] = (Number(result.clientWithTracing) / Number(result.clientNoTracing)).toFixed(3);
+    let result: any = {};
+    for (let k of Object.keys(vresult)) {
+      let o: any = (vresult as any)[k];
+      result[k] = o instanceof Values ? o.toString() : o;
+    }
+    result["tracingFactor"] = (vresult.durWithTracing.statistics().mean / vresult.durNoTracing.statistics().mean).toFixed(3);
+    result["clientFactor"] = (vresult.clientWithTracing.statistics().mean / vresult.clientNoTracing.statistics().mean).toFixed(3);
     results.push(result);
   }
-  await browser.close();
   console.table(results);
 }
 
