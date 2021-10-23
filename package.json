@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "bench": "ts-node src/runBenchmark.ts"
+    "bench": "ts-node src/runBenchmark.ts",
+    "select": "ts-node src/selectorIssue.ts"
   },
   "author": "",
   "license": "Apache-2.0",
