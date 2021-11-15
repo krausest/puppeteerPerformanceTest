@@ -3,7 +3,7 @@ import puppeteer from "puppeteer-core";
 import { Browser, Page } from "puppeteer-core";
 import { resourceLimits } from "worker_threads";
 const jStat = require("jstat").jStat;
-
+// Obsolete version, was replaced by runBenchmark[Framework][BrowserReuse]
 class Values {
   private values: number[] = [];
   public add(value: number) {
