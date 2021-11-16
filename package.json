@@ -9,7 +9,9 @@
     "chromedriverIt": "ts-node src/runBenchmarkChromedriverIt.ts",
     "puppeteerFw": "ts-node src/runBenchmarkPuppeteerFw.ts",
     "playwrightFw": "ts-node src/runBenchmarkPlaywrightFw.ts",
-    "chromedriverFw": "ts-node src/runBenchmarkChromedriverFw.ts"
+    "chromedriverFw": "ts-node src/runBenchmarkChromedriverFw.ts",
+    "bench": "ts-node src/runBenchmark.ts",
+    "select": "ts-node src/selectorIssue.ts"
   },
   "author": "",
   "license": "Apache-2.0",

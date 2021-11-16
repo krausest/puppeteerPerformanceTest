@@ -135,11 +135,20 @@ async function main() {
   const COUNT = 8;
 
   const doTrace = [true, false];
-  // const framkeworks = ["svelte"];
+  // const framkeworks = ["vanillajs"];
   const framkeworks = ["vanillajs", "svelte", "react-hooks", "domvm", "fidan"];
   const makeUrl = (name: string) => `https://stefankrause.net/chrome-perf/frameworks/keyed/${name}/index.html`;
   let results: any[] = [];
 
+  const browser = await init();
+  const page = await browser.newPage();
+  page.on("console", async (msg) => {
+    for (let i = 0; i < msg.args().length; ++i) {
+      let val = await msg.args()[i].jsonValue();
+      consoleBuffer.push((val as any).toString());
+      console.log(`[CONSOLE]: ${val}`);
+    }
+  });
   for (let framework of framkeworks) {
     let vresult = {
       framework,
@@ -151,19 +160,9 @@ async function main() {
     };
     for (let trace of doTrace) {
       for (let i = 0; i < COUNT; i++) {
-        const browser = await init();
-        const page = await browser.newPage();
-        page.on("console", async (msg) => {
-          for (let i = 0; i < msg.args().length; ++i) {
-            let val = await msg.args()[i].jsonValue();
-            consoleBuffer.push((val as any).toString());
-            console.log(`${framework} ${trace ? "trace" : "notrace"} [CONSOLE]: ${val}`);
-          }
-        });
         let duration = await run(page, framework, makeUrl(framework), trace);
         vresult[trace ? "taskTracing" : "taskNoTracing"].add(duration.task);
         if (trace) vresult["timeline"].add(duration.timelineResult);
-        await browser.close();
       }
       if (consoleBuffer.length != COUNT) throw "Expected 5 console messages, but there were only " + consoleBuffer;
       consoleBuffer.forEach((c) => {
@@ -180,6 +179,7 @@ async function main() {
     result["clientFactor"] = (vresult.clientTracing.statistics().mean / vresult.clientNoTracing.statistics().mean).toFixed(3);
     results.push(result);
   }
+  await browser.close();
   console.table(results);
 }
 
