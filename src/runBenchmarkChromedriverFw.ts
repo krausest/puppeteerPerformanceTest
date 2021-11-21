@@ -105,8 +105,6 @@ async function getDuration(driver: WebDriver, framework: string, url: string, tr
   let duration = [];
   if (trace) {
     let timelineResults = await fetchEventsFromPerformanceLog(driver);
-    console.log(timelineResults, timelineResults);
-
     for (let timelineResult of timelineResults) {
       duration.push((timelineResult.paintEnd - timelineResult.clickStart) / 1000.0);
     }
