@@ -1,70 +1,19 @@
 import { readFile } from "fs/promises";
 import puppeteer from "puppeteer-core";
 import { Browser, Page } from "puppeteer-core";
-const jStat = require("jstat").jStat;
-
-class Values {
-  private values: number[] = [];
-  public add(value: number) {
-    this.values.push(value);
-  }
-  public statistics() {
-    let s = jStat(this.values);
-    let r = {
-      mean: s.mean(),
-      standardDeviation: s.stdev(true),
-    };
-    // console.log(r, this.values);
-    return r;
-  }
-  toString() {
-    let s = this.statistics();
-    return `${s.mean.toFixed(3)} (${s.standardDeviation.toFixed(3)})`;
-  }
-}
-
-/* Simulate what js-framework-benchmark does when computing
- the duration from the chrome tracing events */
-interface TimelineEvents {
-  clickStart: number;
-  paintEnd: number;
-}
-
-function extractRelevantEvents(entries: any[]): TimelineEvents {
-  let result = { clickStart: 0, paintEnd: 0 };
-  entries.forEach((x) => {
-    let e = x;
-    // console.log(JSON.stringify(e));
-    if (e.name === "EventDispatch") {
-      if (e.args.data.type === "click") {
-        // console.log("CLICK ",+e.ts);
-        result.clickStart = +e.ts;
-      }
-    } else if (e.name === "Paint" && e.ph === "X") {
-      result.paintEnd = Math.max(result.paintEnd, +e.ts + e.dur);
-    }
-  });
-  return result;
-}
-
-async function fetchEventsFromPerformanceLog(fileName: string): Promise<TimelineEvents> {
-  let contents = await readFile(fileName, { encoding: "utf8" });
-  let json = JSON.parse(contents);
-  let entries = json["traceEvents"];
-  return extractRelevantEvents(entries);
-}
+import { TimelineEvents, Values, fetchEventsFromPerformanceLog, makeUrl, sleep } from "./common";
 
 /* Initialize puppeteer  */
-async function init() {
+async function init(executable: string) {
   const width = 1280;
   const height = 800;
 
   const browser = await puppeteer.launch({
     headless: false,
     // Change path here when chrome isn't found
-    executablePath: process.platform == "darwin" ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" : "google-chrome",
+    executablePath: executable,
     ignoreDefaultArgs: ["--enable-automation"],
-    args: [`--window-size=${width * 2},${height * 2}`],
+    args: [`--window-size=${width},${height}`],
     dumpio: false,
     defaultViewport: {
       width,
@@ -82,7 +31,6 @@ async function run(page: Page, framework: string, url: string, trace: boolean) {
   await page.goto(url);
   await page.waitForSelector("#add");
 
-  let metricsBefore = await page.metrics();
   let traceFileName = `trace_${framework}.json`;
 
   if (trace) {
@@ -94,28 +42,10 @@ async function run(page: Page, framework: string, url: string, trace: boolean) {
   }
 
   await page.click("#add");
-  let recalcStyleCountOfPreviousFrame = metricsBefore.RecalcStyleCount,
-    layoutCountOfPreviousFrame = metricsBefore.LayoutCount;
-  // for (let i = 0; i < 100; i++) {
-  //   const { RecalcStyleCount, LayoutCount } = await page.metrics();
-  //   const isStable = recalcStyleCountOfPreviousFrame === RecalcStyleCount && LayoutCount === layoutCountOfPreviousFrame;
-  //   if (isStable) {
-  //     break;
-  //   }
-  //   recalcStyleCountOfPreviousFrame = RecalcStyleCount;
-  //   layoutCountOfPreviousFrame = LayoutCount;
-  //   await new Promise((res) => globalThis.setTimeout(res, 16, []));
-  // }
-  await new Promise((res) => globalThis.setTimeout(res, 100, []));
-  let metricsAfter = await page.metrics();
-  //   console.log(metricsAfter);
   let duration = {
-    // style: (metricsAfter.RecalcStyleDuration! - metricsBefore.RecalcStyleDuration!) * 1000.0,
-    // layout: (metricsAfter.LayoutDuration! - metricsBefore.LayoutDuration!) * 1000.0,
-    // script: (metricsAfter.ScriptDuration! - metricsBefore.ScriptDuration!) * 1000.0,
-    // task: (metricsAfter.TaskDuration! - metricsBefore.TaskDuration!) * 1000.0,
     timelineResult: 0,
   };
+  await sleep(500);
   if (trace) {
     await page.tracing.stop();
     let timelineResult = await fetchEventsFromPerformanceLog(traceFileName);
@@ -127,21 +57,17 @@ async function run(page: Page, framework: string, url: string, trace: boolean) {
   return duration;
 }
 
-async function main() {
+export async function main(executable: string, COUNT: number, framkeworks: string[]) {
   // The frameworks attempt to measure duration on the client side and print it on the
   // console. We're buffering the console output to compute the average.
   let consoleBuffer: string[] = [];
 
-  const COUNT = 25;
-
   const doTrace = [true, false];
-  // const framkeworks = ["svelte"];
-  const framkeworks = ["vanillajs", "svelte"]; //, "react-hooks", "domvm", "fidan"];
-  const makeUrl = (name: string) => `https://stefankrause.net/chrome-perf/frameworks/keyed/${name}/index.html`;
   let results: any[] = [];
 
   for (let framework of framkeworks) {
     let vresult = {
+      runner: "puppeteerFw",
       framework,
       // taskTracing: new Values(),
       // taskNoTracing: new Values(),
@@ -150,7 +76,7 @@ async function main() {
       timeline: new Values(),
     };
     for (let trace of doTrace) {
-      const browser = await init();
+      const browser = await init(executable);
       const page = await browser.newPage();
       page.on("console", async (msg) => {
         for (let i = 0; i < msg.args().length; ++i) {
@@ -161,7 +87,6 @@ async function main() {
       });
       for (let i = 0; i < COUNT; i++) {
         let duration = await run(page, framework, makeUrl(framework), trace);
-        // vresult[trace ? "taskTracing" : "taskNoTracing"].add(duration.task);
         if (trace) vresult["timeline"].add(duration.timelineResult);
       }
       if (consoleBuffer.length != COUNT) throw new Error(`Expected ${COUNT} console messages, but there were only ${consoleBuffer.length}`);
@@ -176,12 +101,11 @@ async function main() {
       let o: any = (vresult as any)[k];
       result[k] = o instanceof Values ? o.toString() : o;
     }
-    // result["taskFactor"] = (vresult.taskTracing.statistics().mean / vresult.taskNoTracing.statistics().mean).toFixed(3);
+    console.log(framework, vresult.timeline.values);
     result["clientFactor"] = (vresult.clientTracing.statistics().mean / vresult.clientNoTracing.statistics().mean).toFixed(3);
     results.push(result);
   }
   console.log("puppeteerFw");
   console.table(results);
+  return results;
 }
-
-main().then(() => console.log("done"));

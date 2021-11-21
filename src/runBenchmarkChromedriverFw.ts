@@ -1,33 +1,8 @@
 import { By, Capabilities, Condition, logging, WebDriver, WebElement } from "selenium-webdriver";
 import * as chrome from "selenium-webdriver/chrome";
-const jStat = require("jstat").jStat;
+import { TimelineEvents, Values, makeUrl, sleep } from "./common";
 
-class Values {
-  private values: number[] = [];
-  public add(value: number) {
-    this.values.push(value);
-  }
-  public statistics() {
-    let s = jStat(this.values);
-    let r = {
-      mean: s.mean(),
-      standardDeviation: s.stdev(true),
-    };
-    // console.log(r, this.values);
-    return r;
-  }
-  toString() {
-    let s = this.statistics();
-    return `${s.mean.toFixed(3)} (${s.standardDeviation.toFixed(3)})`;
-  }
-}
-
-/* Simulate what js-framework-benchmark does when computing
- the duration from the chrome tracing events */
-interface TimelineEvents {
-  clickStart: number;
-  paintEnd: number;
-}
+var chromedriver: any = require("chromedriver");
 
 function extractRelevantEvents(entries: any[]): TimelineEvents[] {
   let results: TimelineEvents[] = [];
@@ -42,7 +17,8 @@ function extractRelevantEvents(entries: any[]): TimelineEvents[] {
       if (e.params.args.data.type === "click") {
         result.clickStart = +e.params.ts;
       }
-    } else if (e.params.name === "Paint") {
+    } else if (e.params.name === "Paint" && e.params.ph === "X") {
+      console.log(e.params);
       result.paintEnd = Math.max(result.paintEnd, +e.params.ts + e.params.dur);
     }
   });
@@ -54,15 +30,9 @@ async function fetchEventsFromPerformanceLog(driver: WebDriver): Promise<Timelin
   return extractRelevantEvents(entries);
 }
 
-function init(trace: boolean): WebDriver {
+function init(executable: string, trace: boolean): WebDriver {
   let width = 1280;
   let height = 800;
-
-  // Fix for chrome 95:
-  if (process.platform === "linux") {
-    width *= 2;
-    height *= 2;
-  }
 
   let args = [
     // "--js-flags=--expose-gc",
@@ -86,7 +56,7 @@ function init(trace: boolean): WebDriver {
         platform: "ANY",
         version: "stable",
         "goog:chromeOptions": {
-          binary: "/usr/bin/google-chrome",
+          binary: executable,
           args: args,
           perfLoggingPrefs: {
             enableNetwork: true,
@@ -105,7 +75,7 @@ function init(trace: boolean): WebDriver {
         platform: "ANY",
         version: "stable",
         "goog:chromeOptions": {
-          binary: "/usr/bin/google-chrome",
+          binary: executable,
           args: args,
           excludeSwitches: ["enable-automation"],
         },
@@ -135,6 +105,8 @@ async function getDuration(driver: WebDriver, framework: string, url: string, tr
   let duration = [];
   if (trace) {
     let timelineResults = await fetchEventsFromPerformanceLog(driver);
+    console.log(timelineResults, timelineResults);
+
     for (let timelineResult of timelineResults) {
       duration.push((timelineResult.paintEnd - timelineResult.clickStart) / 1000.0);
     }
@@ -145,38 +117,36 @@ async function getDuration(driver: WebDriver, framework: string, url: string, tr
   return duration;
 }
 
-async function main() {
+export async function main(executable: string, COUNT: number, framkeworks: string[]) {
   let consoleBuffer: string[] = [];
 
-  const COUNT = 25;
   let logmatch = /^https:\/\/stefankrause\.net.* (\d+(\.\d+)?)$/;
 
   const doTrace = [true, false];
-  const framkeworks = ["vanillajs", "svelte"]; //, "react-hooks", "domvm", "fidan"];
-  const makeUrl = (name: string) => `https://stefankrause.net/chrome-perf/frameworks/keyed/${name}/index.html`;
   let results: any[] = [];
 
   for (let framework of framkeworks) {
     let vresult = {
+      runner: "chromedriverFw",
       framework,
       clientTracing: new Values(),
       clientNoTracing: new Values(),
       timeline: new Values(),
     };
     for (let trace of doTrace) {
-      const driver = await init(trace);
+      const driver = await init(executable, trace);
       try {
         consoleBuffer = [];
         for (let i = 0; i < COUNT; i++) {
           await run(driver, framework, makeUrl(framework), trace);
         }
+        await sleep(500);
         let durations = await getDuration(driver, framework, makeUrl(framework), trace);
         if (trace) {
           for (let result of durations) {
             vresult["timeline"].add(result);
           }
         }
-        await driver.sleep(500);
         let logEntries = await driver.manage().logs().get(logging.Type.BROWSER);
         for (let entry of logEntries) {
           let m = entry.message.match(logmatch);
@@ -201,11 +171,11 @@ async function main() {
       let o: any = (vresult as any)[k];
       result[k] = o instanceof Values ? o.toString() : o;
     }
+    console.log(framework, vresult.timeline.values);
     result["clientFactor"] = (vresult.clientTracing.statistics().mean / vresult.clientNoTracing.statistics().mean).toFixed(3);
     results.push(result);
   }
   console.log("chromedriverFw");
   console.table(results);
+  return results;
 }
-
-main().then(() => console.log("done"));
