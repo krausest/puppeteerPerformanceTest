@@ -23,5 +23,6 @@ async function main() {
 }
 //  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 //  /usr/bin/google-chrome
+// "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" 
 
 main().then(() => {});

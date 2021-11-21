@@ -86,7 +86,9 @@ export async function main(executable: string, COUNT: number, framkeworks: strin
         let duration = await run(page, framework, makeUrl(framework), trace);
         // vresult[trace ? "taskTracing" : "taskNoTracing"].add(duration.task);
         if (trace) vresult["timeline"].add(duration.timelineResult);
-        await browser.close();
+        try {
+          await browser.close();
+        } catch (err) {console.log("error closing puppeteer")};
       }
       if (consoleBuffer.length != COUNT) throw new Error(`Expected ${COUNT} console messages, but there were only ${consoleBuffer.length}`);
       consoleBuffer.forEach((c) => {

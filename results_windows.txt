@@ -1,0 +1,658 @@
+┌─────────┬──────────────────┬─────────────┬────────────────────┬────────────────────┬────────────────────┬──────────────┐
+│ (index) │      runner      │  framework  │   clientTracing    │  clientNoTracing   │      timeline      │ clientFactor │
+├─────────┼──────────────────┼─────────────┼────────────────────┼────────────────────┼────────────────────┼──────────────┤
+│    0    │  'puppeteerIt'   │ 'vanillajs' │  '90.420 (1.933)'  │  '93.212 (4.285)'  │  '90.262 (1.951)'  │   '0.970'    │
+│    1    │  'puppeteerIt'   │  'svelte'   │ '116.268 (3.901)'  │ '112.624 (6.676)'  │ '115.962 (3.944)'  │   '1.032'    │
+│    2    │  'puppeteerFw'   │ 'vanillajs' │ '101.512 (18.177)' │ '98.484 (12.597)'  │ '100.231 (17.666)' │   '1.031'    │
+│    3    │  'puppeteerFw'   │  'svelte'   │ '109.660 (5.805)'  │ '111.776 (14.106)' │ '108.563 (5.496)'  │   '0.981'    │
+│    4    │  'playwrigthIt'  │ 'vanillajs' │  '92.620 (2.367)'  │  '93.556 (3.644)'  │  '92.283 (2.329)'  │   '0.990'    │
+│    5    │  'playwrigthIt'  │  'svelte'   │ '119.320 (4.928)'  │ '112.808 (3.656)'  │ '118.996 (4.900)'  │   '1.058'    │
+│    6    │  'playwrigthFw'  │ 'vanillajs' │  '91.404 (5.971)'  │  '90.568 (7.827)'  │  '90.588 (5.579)'  │   '1.009'    │
+│    7    │  'playwrigthFw'  │  'svelte'   │ '114.020 (10.140)' │ '105.788 (7.181)'  │ '110.673 (5.410)'  │   '1.078'    │
+│    8    │ 'chromedriverIt' │ 'vanillajs' │  '94.644 (5.191)'  │  '91.944 (1.604)'  │  '92.566 (5.284)'  │   '1.029'    │
+│    9    │ 'chromedriverIt' │  'svelte'   │ '122.188 (4.765)'  │ '114.536 (8.417)'  │ '119.795 (4.648)'  │   '1.067'    │
+│   10    │ 'chromedriverFw' │ 'vanillajs' │  '88.992 (4.819)'  │  '88.172 (5.430)'  │  '87.282 (4.815)'  │   '1.009'    │
+│   11    │ 'chromedriverFw' │  'svelte'   │ '115.060 (14.408)' │ '105.384 (6.637)'  │ '112.523 (14.206)' │   '1.092'    │
+└─────────┴──────────────────┴─────────────┴────────────────────┴────────────────────┴────────────────────┴──────────────┘
+
+
+
+
+vanillajs [
+   93.51, 91.444, 89.053, 88.836,
+  97.452, 89.762, 92.116, 89.553,
+   89.59, 90.704,  89.13, 90.335,
+  89.408, 88.875, 92.223, 89.202,
+  89.169, 88.551, 90.703,  89.28,
+  90.032, 88.618, 90.563, 88.966,
+  89.475
+]
+svelte [
+  133.251, 113.757, 117.409,
+  112.985, 113.851, 115.799,
+  114.617, 116.466, 114.765,
+  113.592, 113.014, 119.687,
+  115.243, 116.446, 113.729,
+  114.477, 116.139, 113.857,
+  117.155, 113.762, 115.349,
+  117.521, 115.586, 115.288,
+  115.301
+]
+puppeteerIt
+┌─────────┬───────────────┬─────────────┬───────────────────┬───────────────────┬───────────────────┬──────────────┐
+│ (index) │    runner     │  framework  │   clientTracing   │  clientNoTracing  │     timeline      │ clientFactor │
+├─────────┼───────────────┼─────────────┼───────────────────┼───────────────────┼───────────────────┼──────────────┤
+│    0    │ 'puppeteerIt' │ 'vanillajs' │ '90.420 (1.933)'  │ '93.212 (4.285)'  │ '90.262 (1.951)'  │   '0.970'    │
+│    1    │ 'puppeteerIt' │  'svelte'   │ '116.268 (3.901)' │ '112.624 (6.676)' │ '115.962 (3.944)' │   '1.032'    │
+└─────────┴───────────────┴─────────────┴───────────────────┴───────────────────┴───────────────────┴──────────────┘
+vanillajs [
+   90.278,  96.715,  85.688,
+   87.571,  99.335,  89.915,
+  103.337,  82.404, 125.054,
+  117.855,  93.141, 104.454,
+   99.431,  88.253, 121.543,
+   93.806, 150.794,   88.35,
+   90.392,  89.376, 112.223,
+   82.539,   95.43,  82.547,
+  135.338
+]
+svelte [
+  113.883,  113.43, 109.838,
+  111.997, 111.383, 111.062,
+  106.863, 112.209, 107.331,
+  107.502,  105.62,  106.04,
+  100.255,  103.77, 105.416,
+  106.037, 102.071, 113.193,
+  105.867, 111.184, 100.589,
+  125.139, 109.531, 113.297,
+  100.575
+]
+puppeteerFw
+┌─────────┬───────────────┬─────────────┬────────────────────┬────────────────────┬────────────────────┬──────────────┐
+│ (index) │    runner     │  framework  │   clientTracing    │  clientNoTracing   │      timeline      │ clientFactor │
+├─────────┼───────────────┼─────────────┼────────────────────┼────────────────────┼────────────────────┼──────────────┤
+│    0    │ 'puppeteerFw' │ 'vanillajs' │ '101.512 (18.177)' │ '98.484 (12.597)'  │ '100.231 (17.666)' │   '1.031'    │
+│    1    │ 'puppeteerFw' │  'svelte'   │ '109.660 (5.805)'  │ '111.776 (14.106)' │ '108.563 (5.496)'  │   '0.981'    │
+└─────────┴───────────────┴─────────────┴────────────────────┴────────────────────┴────────────────────┴──────────────┘
+vanillajs [
+  92.954, 90.565, 90.965, 93.857,
+  92.949, 90.155, 91.643, 90.702,
+  97.896, 90.892, 90.295, 89.742,
+  91.108, 95.696, 95.262, 96.079,
+  91.162, 91.151, 90.305, 90.826,
+  92.817, 95.122, 89.716, 90.292,
+  94.936
+]
+svelte [
+  114.936, 114.112, 124.828,
+   117.14, 117.152,  115.74,
+  117.068, 117.871, 116.375,
+  137.514, 118.198,  116.17,
+  123.327, 118.265, 117.038,
+  115.082, 120.562, 120.018,
+  116.223, 119.832, 121.062,
+   117.61, 126.092, 116.559,
+  116.121
+]
+playwrigthIt
+┌─────────┬────────────────┬─────────────┬───────────────────┬───────────────────┬───────────────────┬──────────────┐
+│ (index) │     runner     │  framework  │   clientTracing   │  clientNoTracing  │     timeline      │ clientFactor │
+├─────────┼────────────────┼─────────────┼───────────────────┼───────────────────┼───────────────────┼──────────────┤
+│    0    │ 'playwrigthIt' │ 'vanillajs' │ '92.620 (2.367)'  │ '93.556 (3.644)'  │ '92.283 (2.329)'  │   '0.990'    │
+│    1    │ 'playwrigthIt' │  'svelte'   │ '119.320 (4.928)' │ '112.808 (3.656)' │ '118.996 (4.900)' │   '1.058'    │
+└─────────┴────────────────┴─────────────┴───────────────────┴───────────────────┴───────────────────┴──────────────┘
+new page
+fake start tracing
+run 0 false
+[CONSOLE] false: 96.20000000018626
+fake start tracing
+run 1 false
+[CONSOLE] false: 91.30000000004657
+fake start tracing
+run 2 false
+[CONSOLE] false: 91.80000000004657
+fake start tracing
+run 3 false
+[CONSOLE] false: 90.60000000009313
+fake start tracing
+run 4 false
+[CONSOLE] false: 95.39999999990687
+fake start tracing
+run 5 false
+[CONSOLE] false: 88.20000000018626
+fake start tracing
+[CONSOLE] false: 86.19999999995343
+run 6 false
+fake start tracing
+run 7 false
+[CONSOLE] false: 92.10000000009313
+fake start tracing
+run 8 false
+[CONSOLE] false: 85.39999999990687
+fake start tracing
+run 9 false
+[CONSOLE] false: 93.4000000001397
+fake start tracing
+[CONSOLE] false: 86
+run 10 false
+fake start tracing
+[CONSOLE] false: 83.80000000004657
+run 11 false
+fake start tracing
+run 12 false
+[CONSOLE] false: 85
+fake start tracing
+run 13 false
+[CONSOLE] false: 115.0999999998603
+fake start tracing
+run 14 false
+[CONSOLE] false: 94.69999999995343
+fake start tracing
+run 15 false
+[CONSOLE] false: 81.80000000004657
+fake start tracing
+run 16 false
+[CONSOLE] false: 89.4000000001397
+fake start tracing
+run 17 false
+[CONSOLE] false: 109.60000000009313
+fake start tracing
+run 18 false
+[CONSOLE] false: 92.80000000004657
+fake start tracing
+run 19 false
+[CONSOLE] false: 84.89999999990687
+fake start tracing
+run 20 false
+[CONSOLE] false: 84.69999999995343
+fake start tracing
+run 21 false
+[CONSOLE] false: 87.4000000001397
+fake start tracing
+run 22 false
+[CONSOLE] false: 80.60000000009313
+fake start tracing
+run 23 false
+[CONSOLE] false: 90.89999999990687
+fake start tracing
+run 24 false
+[CONSOLE] false: 86.9000000001397
+perform dummy run with start tracing, otherwise one console output is often missing
+[CONSOLE] false: 97.80000000004657
+run done
+close
+new page
+[CONSOLE] true: 92.39999999990687
+run 0 true
+[CONSOLE] true: 90.60000000009313
+run 1 true
+[CONSOLE] true: 93.89999999990687
+run 2 true
+[CONSOLE] true: 88.4000000001397
+run 3 true
+[CONSOLE] true: 98.19999999995343
+run 4 true
+[CONSOLE] true: 83.89999999990687
+run 5 true
+[CONSOLE] true: 94.39999999990687
+run 6 true
+[CONSOLE] true: 104.19999999995343
+run 7 true
+[CONSOLE] true: 94
+run 8 true
+[CONSOLE] true: 88.39999999990687
+run 9 true
+[CONSOLE] true: 88
+run 10 true
+[CONSOLE] true: 101.4000000001397
+run 11 true
+[CONSOLE] true: 87.19999999995343
+run 12 true
+[CONSOLE] true: 94.80000000004657
+run 13 true
+[CONSOLE] true: 88.89999999990687
+run 14 true
+[CONSOLE] true: 93.60000000009313
+run 15 true
+[CONSOLE] true: 83.80000000004657
+run 16 true
+[CONSOLE] true: 87.80000000004657
+run 17 true
+[CONSOLE] true: 96.19999999995343
+run 18 true
+[CONSOLE] true: 102.69999999995343
+run 19 true
+[CONSOLE] true: 83.60000000009313
+run 20 true
+[CONSOLE] true: 86.5
+run 21 true
+[CONSOLE] true: 88.19999999995343
+run 22 true
+[CONSOLE] true: 91.5
+run 23 true
+[CONSOLE] true: 82.5
+run 24 true
+run done
+close
+vanillajs [
+  92.033, 90.231, 91.916,  88.026,
+  96.261, 83.502, 94.028, 102.829,
+  93.419, 87.408, 87.633,  98.142,
+  86.777, 92.399, 88.338,  92.944,
+  83.403, 87.453, 95.821, 102.192,
+  83.071, 86.142, 87.819,  90.835,
+  82.076
+]
+new page
+fake start tracing
+run 0 false
+[CONSOLE] false: 119.5999999998603
+fake start tracing
+run 1 false
+[CONSOLE] false: 105.20000000018626
+fake start tracing
+run 2 false
+[CONSOLE] false: 108.5
+fake start tracing
+run 3 false
+[CONSOLE] false: 109.30000000004657
+fake start tracing
+run 4 false
+[CONSOLE] false: 109.10000000009313
+fake start tracing
+run 5 false
+[CONSOLE] false: 105
+fake start tracing
+[CONSOLE] false: 109
+run 6 false
+fake start tracing
+run 7 false
+[CONSOLE] false: 98.5
+fake start tracing
+run 8 false
+[CONSOLE] false: 104
+fake start tracing
+run 9 false
+[CONSOLE] false: 120.10000000009313
+fake start tracing
+run 10 false
+[CONSOLE] false: 114.60000000009313
+fake start tracing
+run 11 false
+[CONSOLE] false: 98.69999999995343
+fake start tracing
+run 12 false
+[CONSOLE] false: 101.69999999995343
+fake start tracing
+[CONSOLE] false: 99.80000000004657
+run 13 false
+fake start tracing
+run 14 false
+[CONSOLE] false: 115.5
+fake start tracing
+run 15 false
+[CONSOLE] false: 115.89999999990687
+fake start tracing
+run 16 false
+[CONSOLE] false: 95.80000000004657
+fake start tracing
+run 17 false
+[CONSOLE] false: 98.9000000001397
+fake start tracing
+[CONSOLE] false: 100.5999999998603
+run 18 false
+fake start tracing
+[CONSOLE] false: 106.60000000009313
+run 19 false
+fake start tracing
+run 20 false
+[CONSOLE] false: 98.5
+fake start tracing
+run 21 false
+[CONSOLE] false: 100
+fake start tracing
+run 22 false
+[CONSOLE] false: 103.9000000001397
+fake start tracing
+run 23 false
+[CONSOLE] false: 109.5
+fake start tracing
+run 24 false
+[CONSOLE] false: 96.39999999990687
+perform dummy run with start tracing, otherwise one console output is often missing
+[CONSOLE] false: 107.30000000004657
+run done
+close
+new page
+[CONSOLE] true: 117.5
+run 0 true
+[CONSOLE] true: 113
+run 1 true
+[CONSOLE] true: 113.4000000001397
+run 2 true
+[CONSOLE] true: 120.89999999990687
+run 3 true
+[CONSOLE] true: 118.5
+run 4 true
+[CONSOLE] true: 109.5
+run 5 true
+[CONSOLE] true: 110.5999999998603
+run 6 true
+[CONSOLE] true: 108.5
+run 7 true
+[CONSOLE] true: 124.4000000001397
+run 8 true
+[CONSOLE] true: 152.89999999990687
+run 9 true
+[CONSOLE] true: 124
+run 10 true
+[CONSOLE] true: 106.9000000001397
+run 11 true
+[CONSOLE] true: 112.5
+run 12 true
+[CONSOLE] true: 109
+run 13 true
+[CONSOLE] true: 117.39999999990687
+run 14 true
+[CONSOLE] true: 103.29999999981374
+run 15 true
+[CONSOLE] true: 109.30000000004657
+run 16 true
+[CONSOLE] true: 109.4000000001397
+run 17 true
+[CONSOLE] true: 118.30000000004657
+run 18 true
+[CONSOLE] true: 103.0999999998603
+run 19 true
+[CONSOLE] true: 107.69999999995343
+run 20 true
+[CONSOLE] true: 107.9000000001397
+run 21 true
+[CONSOLE] true: 118.80000000004657
+run 22 true
+[CONSOLE] true: 104
+run 23 true
+[CONSOLE] true: 109.69999999995343
+run 24 true
+run done
+close
+svelte [
+  117.007, 112.575, 111.883,
+  120.436, 117.992, 109.162,
+  109.486, 108.074,   122.8,
+  119.105, 115.161, 106.494,
+  111.815, 108.562, 108.741,
+  101.729, 108.784, 108.874,
+  108.719, 102.651, 107.203,
+  107.548, 109.359, 103.463,
+    109.2
+]
+playwrigthFw
+┌─────────┬────────────────┬─────────────┬────────────────────┬───────────────────┬───────────────────┬──────────────┐
+│ (index) │     runner     │  framework  │   clientTracing    │  clientNoTracing  │     timeline      │ clientFactor │
+├─────────┼────────────────┼─────────────┼────────────────────┼───────────────────┼───────────────────┼──────────────┤
+│    0    │ 'playwrigthFw' │ 'vanillajs' │  '91.404 (5.971)'  │ '90.568 (7.827)'  │ '90.588 (5.579)'  │   '1.009'    │
+│    1    │ 'playwrigthFw' │  'svelte'   │ '114.020 (10.140)' │ '105.788 (7.181)' │ '110.673 (5.410)' │   '1.078'    │
+└─────────┴────────────────┴─────────────┴────────────────────┴───────────────────┴───────────────────┴──────────────┘
+
+DevTools listening on ws://127.0.0.1:65327/devtools/browser/30331627-72e4-4330-8835-a33b4c308065
+
+DevTools listening on ws://127.0.0.1:65341/devtools/browser/ff8c8362-761c-4f82-9349-d241af0af826
+
+DevTools listening on ws://127.0.0.1:65355/devtools/browser/5a5a1414-33a9-4dd6-8040-673e9281b09b
+
+DevTools listening on ws://127.0.0.1:65369/devtools/browser/7e51dee6-bd8b-4bd4-9dbd-278cdf18a8cb
+
+DevTools listening on ws://127.0.0.1:65383/devtools/browser/5657458a-3a2d-4beb-85d8-1c0530896961
+
+DevTools listening on ws://127.0.0.1:65397/devtools/browser/e6117ce8-c662-4be2-8d6d-cc4d81f9c9ac
+
+DevTools listening on ws://127.0.0.1:65411/devtools/browser/643e4d07-b3f5-4846-98c5-63c26176f573
+
+DevTools listening on ws://127.0.0.1:65425/devtools/browser/4f357a48-86f4-4b7f-8cc3-7bc5da655ffa
+
+DevTools listening on ws://127.0.0.1:65439/devtools/browser/e13638f3-f479-496f-8c41-cdc59fc7e859
+
+DevTools listening on ws://127.0.0.1:65453/devtools/browser/d0f4139d-b5b3-4eb0-9d71-202ad2aa9288
+
+DevTools listening on ws://127.0.0.1:65467/devtools/browser/8573f00e-58da-4753-90b6-20a071133211
+
+DevTools listening on ws://127.0.0.1:65481/devtools/browser/475adfbe-db93-44af-ba88-e03fc4bf9101
+
+DevTools listening on ws://127.0.0.1:65495/devtools/browser/68868e84-ae8d-4c84-ac78-6eea8210428b
+
+DevTools listening on ws://127.0.0.1:65509/devtools/browser/452d449a-d60a-4325-9aec-f588692ceb37
+
+DevTools listening on ws://127.0.0.1:65523/devtools/browser/ad7297ca-1809-48bc-a7a6-a270a55ecf4c
+
+DevTools listening on ws://127.0.0.1:49157/devtools/browser/21c31b25-a0d0-459f-8eb5-db80227133ee
+
+DevTools listening on ws://127.0.0.1:49171/devtools/browser/6181b6db-c850-491c-b0e1-136c5053c6c9
+
+DevTools listening on ws://127.0.0.1:49185/devtools/browser/dc0468ee-bb7c-4692-be32-6c34f5acd651
+
+DevTools listening on ws://127.0.0.1:49199/devtools/browser/94624c3a-7d23-45ff-8a52-b537d3944244
+
+DevTools listening on ws://127.0.0.1:49213/devtools/browser/e5535543-fe62-47fa-99a0-484d747f4a99
+
+DevTools listening on ws://127.0.0.1:49227/devtools/browser/e5118272-185e-4591-a30b-ebd1f22ec2e0
+
+DevTools listening on ws://127.0.0.1:49241/devtools/browser/1aa05d6f-6347-468b-9128-14ef453f04da
+
+DevTools listening on ws://127.0.0.1:49255/devtools/browser/665b813a-e53c-4b87-8a1d-ce75e998c498
+
+DevTools listening on ws://127.0.0.1:49269/devtools/browser/83cca4f9-5eba-445b-a355-fc7deed0ac06
+
+DevTools listening on ws://127.0.0.1:49283/devtools/browser/b89ece3c-17b0-4095-852b-9d1df70f0494
+
+DevTools listening on ws://127.0.0.1:49297/devtools/browser/f69abc53-2a45-4460-a495-cbb460a85353
+
+DevTools listening on ws://127.0.0.1:49308/devtools/browser/0d834bb8-f5a1-477e-9bad-bbd9b28a38f3
+
+DevTools listening on ws://127.0.0.1:49320/devtools/browser/c2843707-ed73-41c6-98ef-26e581f6fc2c
+
+DevTools listening on ws://127.0.0.1:49332/devtools/browser/6b5a0b61-b037-4004-bc4e-6ee188d08d7b
+
+DevTools listening on ws://127.0.0.1:49344/devtools/browser/71a0b63d-485e-495a-b821-185159a0aa39
+
+DevTools listening on ws://127.0.0.1:49356/devtools/browser/e2cf40f4-cc3e-4989-85ec-d91e36dc204f
+
+DevTools listening on ws://127.0.0.1:49368/devtools/browser/69dafcf2-6766-4d15-821a-fb6793ce661b
+
+DevTools listening on ws://127.0.0.1:49380/devtools/browser/7a62591f-7b4a-4739-adeb-f232aa9ec0c2
+
+DevTools listening on ws://127.0.0.1:49392/devtools/browser/dbfc2e69-e4ec-40bf-8946-c25faf0c48f2
+
+DevTools listening on ws://127.0.0.1:49404/devtools/browser/df5e8596-efa3-4e56-aba9-14d75ee583cb
+
+DevTools listening on ws://127.0.0.1:49416/devtools/browser/c970e59e-1a64-4bc1-be26-8ad98debe739
+
+DevTools listening on ws://127.0.0.1:49427/devtools/browser/37f71a61-db78-4c68-803e-215177e9754a
+
+DevTools listening on ws://127.0.0.1:49439/devtools/browser/14856c2c-1908-4d27-8769-cd83ad285187
+
+DevTools listening on ws://127.0.0.1:49451/devtools/browser/02b67dc7-61dc-40f6-871d-8194b4179e37
+
+DevTools listening on ws://127.0.0.1:49463/devtools/browser/9307bf4c-1131-4491-aa6c-bb4fcdd2fbf8
+
+DevTools listening on ws://127.0.0.1:49475/devtools/browser/9d638c6c-e3d5-482e-8d93-e3d2fc19f8ad
+
+DevTools listening on ws://127.0.0.1:49487/devtools/browser/b114488c-1ce0-44d5-a48e-e74b29a750d3
+
+DevTools listening on ws://127.0.0.1:49499/devtools/browser/e1a6fec3-b3af-4f4e-9c52-d740cdfd3c07
+
+DevTools listening on ws://127.0.0.1:49511/devtools/browser/8416c635-c0c4-4662-8d75-153251ccb026
+
+DevTools listening on ws://127.0.0.1:49523/devtools/browser/ebb65806-0e3b-4622-b074-face2ca33eba
+
+DevTools listening on ws://127.0.0.1:49535/devtools/browser/a733924b-f0e5-45de-a37a-bec09e10b744
+
+DevTools listening on ws://127.0.0.1:49547/devtools/browser/4e0dd53c-4f19-43b4-8cc9-bcce6ec0bcce
+
+DevTools listening on ws://127.0.0.1:49558/devtools/browser/6eb26da4-a290-469b-9158-9d44395935cd
+
+DevTools listening on ws://127.0.0.1:49570/devtools/browser/70352431-afa4-4e89-81a9-1dfdfb49f382
+
+DevTools listening on ws://127.0.0.1:49581/devtools/browser/a6fe3bdc-6d93-4a9d-8bce-4c0ee0b4cb56
+vanillajs [
+  89.363, 91.614, 103.901,  88.953,
+  88.316, 89.584,  89.895,  89.259,
+  93.074, 88.511,  89.154,  88.846,
+  97.362, 89.366,  96.069, 109.554,
+  91.938, 92.852,  98.772,  92.763,
+  89.238, 88.622,  89.846,  96.865,
+  90.421
+]
+
+DevTools listening on ws://127.0.0.1:49593/devtools/browser/92417caa-dca6-494e-89f2-bf0cf1897253
+
+DevTools listening on ws://127.0.0.1:49607/devtools/browser/61338efd-53fd-440a-949e-47844ca6618e
+
+DevTools listening on ws://127.0.0.1:49620/devtools/browser/f659dc05-b607-432f-baba-c2a481ee4dfa
+
+DevTools listening on ws://127.0.0.1:49634/devtools/browser/f099e3af-07b4-4dd6-9c63-1825f8b39df1
+
+DevTools listening on ws://127.0.0.1:49647/devtools/browser/4ed1a2e5-ff43-41f8-a521-98837767c949
+
+DevTools listening on ws://127.0.0.1:49660/devtools/browser/89725e42-5c06-4c2c-bbc0-e9bb953086e3
+
+DevTools listening on ws://127.0.0.1:49680/devtools/browser/d350328c-996a-44c6-9312-e56c6da2e70b
+
+DevTools listening on ws://127.0.0.1:49695/devtools/browser/683477f6-bd3a-4acf-b6c0-e663df9cd99a
+
+DevTools listening on ws://127.0.0.1:49715/devtools/browser/691c23b7-7621-4afb-ac11-3dcc067eca7e
+
+DevTools listening on ws://127.0.0.1:49734/devtools/browser/95622456-f176-4c59-8973-b5576555e6ef
+
+DevTools listening on ws://127.0.0.1:49749/devtools/browser/17850959-fd5d-477b-8d11-c7a0c8ddd17b
+
+DevTools listening on ws://127.0.0.1:49763/devtools/browser/a4f8ad98-0cc0-4f9f-a704-ef6ae9ff69b1
+
+DevTools listening on ws://127.0.0.1:49778/devtools/browser/1fff21d0-c0fb-4f05-ba75-2c94f0e72dfb
+
+DevTools listening on ws://127.0.0.1:49795/devtools/browser/1f41837e-94a0-41c6-b979-71eade326b62
+
+DevTools listening on ws://127.0.0.1:49810/devtools/browser/525a139f-d467-4ce7-9277-4f13d5999b05
+
+DevTools listening on ws://127.0.0.1:49825/devtools/browser/aac88e74-4e9f-403c-b25a-bcf79bfb8924
+
+DevTools listening on ws://127.0.0.1:49844/devtools/browser/92ea26d7-3f02-472f-8703-2b456d2a558d
+
+DevTools listening on ws://127.0.0.1:49859/devtools/browser/ae264333-49a4-4c40-b214-8af557ea0d6c
+
+DevTools listening on ws://127.0.0.1:49875/devtools/browser/a02f6e06-57a2-401c-a9d9-ef77490eed7e
+
+DevTools listening on ws://127.0.0.1:49889/devtools/browser/dc3ad4b5-ac63-466c-9b1c-f0310eca5d5c
+
+DevTools listening on ws://127.0.0.1:49906/devtools/browser/c29f94c6-2930-40ec-a898-5b146e16e4b0
+
+DevTools listening on ws://127.0.0.1:49925/devtools/browser/ddd2280f-bb92-4fec-8a80-7520043e0acb
+
+DevTools listening on ws://127.0.0.1:49943/devtools/browser/29878283-27f0-4c62-90a7-bcad011b9558
+
+DevTools listening on ws://127.0.0.1:49956/devtools/browser/ae4839fc-ea42-41bf-a8a7-d8b02fe85cb6
+
+DevTools listening on ws://127.0.0.1:49970/devtools/browser/62208b6a-68c2-4ad3-a946-1c7262df4fac
+
+DevTools listening on ws://127.0.0.1:49984/devtools/browser/44dfc51a-e6cf-4e06-a904-e54eada945c7
+
+DevTools listening on ws://127.0.0.1:49996/devtools/browser/2d46c47c-9c19-4b83-a648-04176a2ba5cf
+
+DevTools listening on ws://127.0.0.1:50068/devtools/browser/34a10ec1-e2d1-4421-b3d1-b3ead68afeac
+
+DevTools listening on ws://127.0.0.1:50080/devtools/browser/d2f2d0b6-44ef-4ce6-a1f0-06b97ecf097f
+
+DevTools listening on ws://127.0.0.1:50091/devtools/browser/5810fcd2-acbb-4214-9521-b969f41d2364
+
+DevTools listening on ws://127.0.0.1:50102/devtools/browser/6849cebc-3051-4ec3-b2e8-24575c218d9e
+
+DevTools listening on ws://127.0.0.1:50114/devtools/browser/79348f67-9acd-4c72-ad96-72a9fa431fdb
+
+DevTools listening on ws://127.0.0.1:50126/devtools/browser/f0b23727-fff5-4aa5-a8ad-328f1b9ee8ff
+
+DevTools listening on ws://127.0.0.1:50137/devtools/browser/f233ec75-4d72-4bab-8f68-2af0377572c9
+
+DevTools listening on ws://127.0.0.1:50148/devtools/browser/9f3566dd-3c20-4424-b80e-77d04f88dc73
+
+DevTools listening on ws://127.0.0.1:50160/devtools/browser/f5e56da3-7161-4599-8228-3a19a0495d11
+
+DevTools listening on ws://127.0.0.1:50173/devtools/browser/9d883f9c-1979-4f27-8d4e-3da19006edf6
+
+DevTools listening on ws://127.0.0.1:50184/devtools/browser/62c14193-e6b3-4b49-b6df-a56731305583
+
+DevTools listening on ws://127.0.0.1:50196/devtools/browser/72545870-24f4-4a6d-a6b5-add788d526b2
+
+DevTools listening on ws://127.0.0.1:50208/devtools/browser/0e858313-69f6-46a8-9842-794975707840
+
+DevTools listening on ws://127.0.0.1:50219/devtools/browser/7df638f5-9d21-4ba3-a3cb-660b7367b99b
+
+DevTools listening on ws://127.0.0.1:50232/devtools/browser/27dd1369-9c27-463a-bc12-ac2418fe21cd
+
+DevTools listening on ws://127.0.0.1:50245/devtools/browser/c1cd37af-b591-49b7-b882-aa9ed93460a2
+
+DevTools listening on ws://127.0.0.1:50257/devtools/browser/f1620d16-1192-4b24-87b6-675b77218db2
+
+DevTools listening on ws://127.0.0.1:50268/devtools/browser/3e11e8ed-c224-432d-a31a-97fa2406c3d6
+
+DevTools listening on ws://127.0.0.1:50279/devtools/browser/35f21ed8-1698-4564-91b4-f7ff8f73ee19
+
+DevTools listening on ws://127.0.0.1:50291/devtools/browser/8d9c6fc0-6c12-4bc7-935b-9ecdfd73f41a
+
+DevTools listening on ws://127.0.0.1:50302/devtools/browser/7d2f3a73-73d9-48b0-99d1-21601887ec1d
+
+DevTools listening on ws://127.0.0.1:50314/devtools/browser/6ec91ae9-e62b-40db-b356-151662c1cd28
+
+DevTools listening on ws://127.0.0.1:50326/devtools/browser/c351336f-08f0-4681-b2df-4efc79b45496
+svelte [
+  123.016, 115.574, 115.463,
+  113.742, 122.679,  120.18,
+  114.238, 128.524, 118.401,
+   130.67, 125.893, 121.891,
+  125.384, 123.504, 117.678,
+  117.128, 120.366, 119.064,
+  115.286, 115.344,  115.39,
+  115.868,   123.9,  117.27,
+  118.414
+]
+chromedriverIt
+┌─────────┬──────────────────┬─────────────┬───────────────────┬───────────────────┬───────────────────┬──────────────┐
+│ (index) │      runner      │  framework  │   clientTracing   │  clientNoTracing  │     timeline      │ clientFactor │
+├─────────┼──────────────────┼─────────────┼───────────────────┼───────────────────┼───────────────────┼──────────────┤
+│    0    │ 'chromedriverIt' │ 'vanillajs' │ '94.644 (5.191)'  │ '91.944 (1.604)'  │ '92.566 (5.284)'  │   '1.029'    │
+│    1    │ 'chromedriverIt' │  'svelte'   │ '122.188 (4.765)' │ '114.536 (8.417)' │ '119.795 (4.648)' │   '1.067'    │
+└─────────┴──────────────────┴─────────────┴───────────────────┴───────────────────┴───────────────────┴──────────────┘
+
+DevTools listening on ws://127.0.0.1:50337/devtools/browser/0050472b-7789-4a73-ba17-92ffe824c5b6
+
+DevTools listening on ws://127.0.0.1:50353/devtools/browser/a3928460-629a-4225-bbd0-0633c81ddb44
+vanillajs [
+  94.697, 103.015, 86.974, 91.581,
+  87.099,   85.75, 85.022, 85.207,
+  81.409,  89.854, 90.769, 84.939,
+  89.394,  83.046, 82.858, 84.541,
+  85.128,  93.238, 84.795, 83.834,
+  84.274,  90.542,  85.96, 86.786,
+  81.337
+]
+
+DevTools listening on ws://127.0.0.1:50368/devtools/browser/569a9c1a-75a7-43a3-8390-04daf20bdcab
+
+DevTools listening on ws://127.0.0.1:50385/devtools/browser/df7f6ddb-1dca-475b-94d7-0b837e0d74fe
+svelte [
+  118.358, 141.899, 108.259,
+  109.648, 113.616, 114.946,
+  104.987, 111.124, 107.916,
+  105.645, 106.912, 101.182,
+   117.01, 104.672, 107.562,
+  146.455, 103.907, 105.172,
+  106.523, 100.984, 104.642,
+  106.252, 106.903, 155.496,
+   103.01
+]
+chromedriverFw
+┌─────────┬──────────────────┬─────────────┬────────────────────┬───────────────────┬────────────────────┬──────────────┐
+│ (index) │      runner      │  framework  │   clientTracing    │  clientNoTracing  │      timeline      │ clientFactor │
+├─────────┼──────────────────┼─────────────┼────────────────────┼───────────────────┼────────────────────┼──────────────┤
+│    0    │ 'chromedriverFw' │ 'vanillajs' │  '88.992 (4.819)'  │ '88.172 (5.430)'  │  '87.282 (4.815)'  │   '1.009'    │
+│    1    │ 'chromedriverFw' │  'svelte'   │ '115.060 (14.408)' │ '105.384 (6.637)' │ '112.523 (14.206)' │   '1.092'    │
+└─────────┴──────────────────┴─────────────┴────────────────────┴───────────────────┴────────────────────┴──────────────┘

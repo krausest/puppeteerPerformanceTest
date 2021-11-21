@@ -18,7 +18,6 @@ function extractRelevantEvents(entries: any[]): TimelineEvents[] {
         result.clickStart = +e.params.ts;
       }
     } else if (e.params.name === "Paint" && e.params.ph === "X") {
-      console.log(e.params);
       result.paintEnd = Math.max(result.paintEnd, +e.params.ts + e.params.dur);
     }
   });
